@@ -19,7 +19,15 @@ import sun.misc.Unsafe;
 
 import com.lmax.disruptor.util.Util;
 
-
+/**
+ * Sequence 前填充7个long，后填充7个long
+ * 目前现代计算机一般缓存行为64字节，这样确保 Sequence 所在的缓存行没有其他数据，独占缓存行，避免伪共享
+ *
+ * 下面举了三个例子，其中 U 为其他业务填充到缓存中的数据，P 为 Sequence 填充的缓存行，V 为实际的有效数据，即Value类中的value
+ * UPPPPPPP VPPPPPPP UUUUUUUU
+ * UUUUUUUU PPPPPPPV PPPPPPPU
+ * UUUUPPPP PPPVPPPP PPPUUUUU
+ */
 class LhsPadding
 {
     protected long p1, p2, p3, p4, p5, p6, p7;

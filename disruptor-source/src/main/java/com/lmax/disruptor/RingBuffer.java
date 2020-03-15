@@ -75,10 +75,15 @@ abstract class RingBufferFields<E> extends RingBufferPad
         }
 
         this.indexMask = bufferSize - 1;
+        // 根据传入的 bufferSize 大小，初始化 ringBuffer entries 数组
         this.entries = new Object[sequencer.getBufferSize() + 2 * BUFFER_PAD];
         fill(eventFactory);
     }
 
+    /**
+     * 内存预加载机制，在创建 RingBuffer 的时候，就直接初始化了entries中每个元素
+     * 通过调用 eventFactory 的 newInstance() 方法
+     */
     private void fill(EventFactory<E> eventFactory)
     {
         for (int i = 0; i < bufferSize; i++)
@@ -95,6 +100,8 @@ abstract class RingBufferFields<E> extends RingBufferPad
 }
 
 /**
+ * RingBuffer 消除缓存行共享类似于 {@link Sequence}，只要 RingBuffer 长度大小大于8个字节，就一定不不会触发伪共享
+ *
  * Ring based store of reusable entries containing the data representing
  * an event being exchanged between event producer and {@link EventProcessor}s.
  *

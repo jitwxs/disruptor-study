@@ -13,7 +13,7 @@ disruptor-study
 
 ## New Case
 
-以完成 Case 包括：
+以完成 Disruptor Case 包括：
 
 - [x] 单生产者单消费者：`jit.wxs.disruptor.demo.quickstart`
 - [x] 单生产者单消费者，消费者多边形消费：`jit.wxs.disruptor.demo.quickstart2`
@@ -21,9 +21,18 @@ disruptor-study
 - [x] 纯 RingBuffer，单生产者单消费者：`jit.wxs.disruptor.demo.ringbuffer`
 - [x] 纯 RingBuffer，多生产者多消费者：`jit.wxs.disruptor.demo.ringbuffer2`
 
+以完成 Test Case 包括：
+
+- [x] 缓存行测试：`jit.wxs.disruptor.demo.flashsharing`
+
 ## Complete Annotation
 
 ## Change Logs
+
+### 1.0.1
+
+- 添加 Sequence、RingBuffer 源码注释
+- 添加缓存行测试 Case
 
 ### 1.0.0
 
