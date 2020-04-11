@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.util.Objects;
 import java.util.concurrent.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -14,25 +15,36 @@ import java.util.logging.Logger;
 public class ThreadPoolUtils {
     private static final Logger logger = Logger.getLogger(ThreadPoolUtils.class.getName());
 
-    private static final long TIMEOUT = 100L, KEEP_ALIVE_TIME = 60L;
+    private static final long TIMEOUT = 100L;
+
+    private static final long KEEP_ALIVE_TIME = 60L;
 
     private static final int MAX_QUEUE_SIZE = 100_0000;
 
-    public static ThreadPoolExecutor poolExecutor(int core, int max, Object... name) {
-        ThreadFactory factory = Objects.nonNull(name) ?
-                new ThreadFactoryBuilder().setNameFormat(Joiner.on(" ").join(name)).build() :
-                new ThreadFactoryBuilder().build();
+    private static final String NAME_SEPARATOR = "";
 
-        return new ThreadPoolExecutor(core, max, KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(MAX_QUEUE_SIZE), factory,
-                new ThreadPoolExecutor.AbortPolicy());
+    private static LogUncaughtExceptionHandler EXCEPTION_HANDLER = new LogUncaughtExceptionHandler();
+
+    public static ThreadPoolExecutor poolExecutor(int core, int max, Object... name) {
+        ThreadFactoryBuilder builder = new ThreadFactoryBuilder();
+        builder.setUncaughtExceptionHandler(EXCEPTION_HANDLER);
+        if(Objects.nonNull(name)) {
+            builder.setNameFormat(Joiner.on(NAME_SEPARATOR).join(name));
+        }
+
+        return new ThreadPoolExecutor(core, max, KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(MAX_QUEUE_SIZE),
+                builder.build(), new ThreadPoolExecutor.AbortPolicy());
     }
 
     public static ScheduledThreadPoolExecutor scheduledExecutor(int core, Object... name) {
-        ThreadFactory factory = Objects.nonNull(name) ?
-                new ThreadFactoryBuilder().setNameFormat(Joiner.on(" ").join(name)).setDaemon(true).build() :
-                new ThreadFactoryBuilder().setDaemon(true).build();
+        ThreadFactoryBuilder builder = new ThreadFactoryBuilder();
+        builder.setUncaughtExceptionHandler(EXCEPTION_HANDLER);
+        builder.setDaemon(true);
+        if(Objects.nonNull(name)) {
+            builder.setNameFormat(Joiner.on(NAME_SEPARATOR).join(name));
+        }
 
-        return new ScheduledThreadPoolExecutor(core, factory);
+        return new ScheduledThreadPoolExecutor(core, builder.build());
     }
 
     public static void shutdown(ExecutorService executor) {
@@ -45,7 +57,7 @@ public class ThreadPoolUtils {
                     TimeUnit.MILLISECONDS.sleep(200);
                 }
             } catch (InterruptedException e) {
-                logger.warning( "ThreadPoolUtils#shutdown error" + e);
+                logger.log(Level.WARNING, "ThreadPoolUtils#shutdown error", e);
             }
             logger.info("ThreadPoolUtils#shutdown success");
         }
@@ -55,7 +67,14 @@ public class ThreadPoolUtils {
         try {
             unit.sleep(timeout);
         } catch (InterruptedException e) {
-            logger.info( "ThreadPoolUtils#sleep error, timeout: {}" + timeout + e);
+            logger.log(Level.WARNING, "ThreadPoolUtils#sleep error, timeout: " + timeout, e);
+        }
+    }
+
+    private static class LogUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+        @Override
+        public void uncaughtException(Thread t, Throwable e) {
+            logger.log(Level.SEVERE, "Uncaught Exception got, thread: " + t.getName(), e);
         }
     }
 }

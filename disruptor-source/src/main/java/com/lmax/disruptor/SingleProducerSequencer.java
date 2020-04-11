@@ -37,7 +37,8 @@ abstract class SingleProducerSequencerFields extends SingleProducerSequencerPad
     }
 
     /**
-     * Set to -1 as sequence starting point
+     * @param nextValue 生产者的下一个可用序号，初始为 -1
+     * @param cachedValue 缓存消费者的最小消费序号，初始为 -1
      */
     long nextValue = Sequence.INITIAL_VALUE;
     long cachedValue = Sequence.INITIAL_VALUE;
@@ -102,6 +103,7 @@ public final class SingleProducerSequencer extends SingleProducerSequencerFields
     }
 
     /**
+     * 单生产者获取下一个可用序号——序号栅栏机制
      * @see Sequencer#next()
      */
     @Override
@@ -116,32 +118,49 @@ public final class SingleProducerSequencer extends SingleProducerSequencerFields
     @Override
     public long next(int n)
     {
+        // 如果要获取的序号数量 < 1 或者大于 ringBuffer 容量，失败
         if (n < 1 || n > bufferSize)
         {
             throw new IllegalArgumentException("n must be > 0 and < bufferSize");
         }
 
+        // nextValue: 生产者当前的消费进度
         long nextValue = this.nextValue;
 
+        // nextSequence: 生产者将要获取的Sequence
         long nextSequence = nextValue + n;
+        // 减去bufferSize后的Sequence值，由于nextValue初始为-1，因此wrapPoint<0表示未覆盖，>0表示已经生产完一圈了，产生了覆盖
         long wrapPoint = nextSequence - bufferSize;
+        // cachedGatingSequence：上次调用时，消费者的最小消费Sequence
         long cachedGatingSequence = this.cachedValue;
 
+        /*
+         * wrapPoint > cachedGatingSequence: 如果本次要生产的Sequence > 上次缓存的消费者的最小Sequence，则说明消费者可能存在消费不及时的情况，需要判断
+         * cachedGatingSequence > nextValue: 正常情况下，生产者的序号都是先于消费者的序号，这个条件是冗余的。
+         *                                   但是当生产/消费的数据大于LONG.MAX_VALUE时，Sequence就会变为负数。
+         *
+         * 上次缓存的消费者的最小Sequence > 生产者当前的消费Sequence，
+         */
         if (wrapPoint > cachedGatingSequence || cachedGatingSequence > nextValue)
         {
-            cursor.setVolatile(nextValue);  // StoreLoad fence
+            cursor.setVolatile(nextValue);  // StoreLoad fence，更新 RingBuffer 的游标
 
+            // minSequence: 所有消费者的最小消费Sequence
             long minSequence;
+            // 自旋等待，直到消费者的最小消费Sequence >= 生产者的序号
             while (wrapPoint > (minSequence = Util.getMinimumSequence(gatingSequences, nextValue)))
             {
                 LockSupport.parkNanos(1L); // TODO: Use waitStrategy to spin?
             }
 
+            // 更新缓存
             this.cachedValue = minSequence;
         }
 
+        // 设置当前的生产进度
         this.nextValue = nextSequence;
 
+        // 返回当前生产进度
         return nextSequence;
     }
 
@@ -203,7 +222,9 @@ public final class SingleProducerSequencer extends SingleProducerSequencerFields
     @Override
     public void publish(long sequence)
     {
+        //  单生产者，直接更新 RingBuffer 游标
         cursor.set(sequence);
+        // 给消费者发送 signal 信号，具体怎么做与 waitStrategy 的实现有关
         waitStrategy.signalAllWhenBlocking();
     }
 

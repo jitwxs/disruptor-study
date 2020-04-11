@@ -113,21 +113,27 @@ public final class BatchEventProcessor<T>
     @Override
     public void run()
     {
+        // 启动任务,状态设置与检测
         if (running.compareAndSet(IDLE, RUNNING))
         {
+            // 先清除序列栅栏的通知状态
             sequenceBarrier.clearAlert();
-
+            // 如果eventHandler实现了LifecycleAware，这里会对其进行一个启动通知。
             notifyStart();
             try
             {
+                // 判断任务是否启动
                 if (running.get() == RUNNING)
                 {
+                    // 处理事件
                     processEvents();
                 }
             }
             finally
             {
+                // 判断一下消费者是否实现了LifecycleAware ,如果实现了这个接口那么此时会发送一个停止通知
                 notifyShutdown();
+                // 重新设置状态
                 running.set(IDLE);
             }
         }
@@ -142,6 +148,7 @@ public final class BatchEventProcessor<T>
             }
             else
             {
+                // 这里就是 notifyStart();notifyShutdown();
                 earlyExit();
             }
         }

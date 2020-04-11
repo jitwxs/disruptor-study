@@ -25,9 +25,21 @@ final class ProcessingSequenceBarrier implements SequenceBarrier
     private final WaitStrategy waitStrategy;
     private final Sequence dependentSequence;
     private volatile boolean alerted = false;
+    /**
+     * cursorSequence 代表的是写指针; 代表事件发布者发布到那个位置
+     */
     private final Sequence cursorSequence;
+    /**
+     * SingleProducerSequencer 或 MultiProducerSequencer 的引用
+     */
     private final Sequencer sequencer;
 
+    /**
+     * @param sequencer          生产者序号控制器
+     * @param waitStrategy       等待策略
+     * @param cursorSequence     生产者序号
+     * @param dependentSequences 依赖的Sequence
+     */
     ProcessingSequenceBarrier(
         final Sequencer sequencer,
         final WaitStrategy waitStrategy,
@@ -37,12 +49,14 @@ final class ProcessingSequenceBarrier implements SequenceBarrier
         this.sequencer = sequencer;
         this.waitStrategy = waitStrategy;
         this.cursorSequence = cursorSequence;
+        // 如果事件处理器不依赖于任何前置处理器, 那么dependentSequence也指向生产者的序号
         if (0 == dependentSequences.length)
         {
             dependentSequence = cursorSequence;
         }
         else
         {
+            // 如果有多个前置处理器，则对其进行封装，实现了组合模式
             dependentSequence = new FixedSequenceGroup(dependentSequences);
         }
     }

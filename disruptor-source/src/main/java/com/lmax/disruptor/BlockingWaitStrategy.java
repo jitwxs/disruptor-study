@@ -24,6 +24,9 @@ import com.lmax.disruptor.util.ThreadHints;
  */
 public final class BlockingWaitStrategy implements WaitStrategy
 {
+    /**
+     * 基于锁等待机制，实现生产者与消费者的协调
+     */
     private final Object mutex = new Object();
 
     @Override
@@ -31,18 +34,22 @@ public final class BlockingWaitStrategy implements WaitStrategy
         throws AlertException, InterruptedException
     {
         long availableSequence;
+        // 如果RingBuffer上当前可用的序列值 < 申请的序列值
         if (cursorSequence.get() < sequence)
         {
+            // 加锁二次判断
             synchronized (mutex)
             {
                 while (cursorSequence.get() < sequence)
                 {
+                    // 检查序列栅栏状态(事件处理器是否被关闭)
                     barrier.checkAlert();
                     mutex.wait();
                 }
             }
         }
 
+        // 再次检测，避免事件处理器关闭的情况
         while ((availableSequence = dependentSequence.get()) < sequence)
         {
             barrier.checkAlert();

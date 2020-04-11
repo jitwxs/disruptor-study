@@ -27,6 +27,9 @@ public final class YieldingWaitStrategy implements WaitStrategy
 {
     private static final int SPIN_TRIES = 100;
 
+    /**
+     * 自旋100次后，如果还没有有可用的sequence，放弃cpu资源
+     */
     @Override
     public long waitFor(
         final long sequence, Sequence cursor, final Sequence dependentSequence, final SequenceBarrier barrier)
@@ -55,6 +58,7 @@ public final class YieldingWaitStrategy implements WaitStrategy
 
         if (0 == counter)
         {
+            // 放弃 CPU 资源
             Thread.yield();
         }
         else

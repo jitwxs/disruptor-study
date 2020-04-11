@@ -164,6 +164,7 @@ public class Disruptor<T>
     @SafeVarargs
     public final EventHandlerGroup<T> handleEventsWith(final EventHandler<? super T>... handlers)
     {
+        // 添加事务处理器
         return createEventProcessors(new Sequence[0], handlers);
     }
 

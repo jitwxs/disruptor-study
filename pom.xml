@@ -13,5 +13,7 @@
         <module>disruptor-source</module>
         <module>disruptor-demo</module>
         <module>disruptor-common</module>
+        <module>disruptor-netty-server</module>
+        <module>disruptor-netty-client</module>
     </modules>
 </project>

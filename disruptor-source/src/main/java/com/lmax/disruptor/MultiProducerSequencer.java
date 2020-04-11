@@ -97,6 +97,7 @@ public final class MultiProducerSequencer extends AbstractSequencer
     }
 
     /**
+     * 多生产者获取下一个可用序号——序号栅栏机制
      * @see Sequencer#next()
      */
     @Override
@@ -111,6 +112,7 @@ public final class MultiProducerSequencer extends AbstractSequencer
     @Override
     public long next(int n)
     {
+        // 如果要获取的序号数量 < 1 或者大于 ringBuffer 容量，失败
         if (n < 1 || n > bufferSize)
         {
             throw new IllegalArgumentException("n must be > 0 and < bufferSize");
@@ -131,6 +133,7 @@ public final class MultiProducerSequencer extends AbstractSequencer
             {
                 long gatingSequence = Util.getMinimumSequence(gatingSequences, current);
 
+                // 消费者仍然没有及时消费，自旋等待
                 if (wrapPoint > gatingSequence)
                 {
                     LockSupport.parkNanos(1); // TODO, should we spin based on the wait strategy?
@@ -139,7 +142,7 @@ public final class MultiProducerSequencer extends AbstractSequencer
 
                 gatingSequenceCache.set(gatingSequence);
             }
-            else if (cursor.compareAndSet(current, next))
+            else if (cursor.compareAndSet(current, next)) // CAS 操作更新 RingBuffer 游标，失败说明其他生产者在争用
             {
                 break;
             }
@@ -215,6 +218,7 @@ public final class MultiProducerSequencer extends AbstractSequencer
     public void publish(final long sequence)
     {
         setAvailable(sequence);
+        // 给消费者发送 signal 信号，具体怎么做与 waitStrategy 的实现有关
         waitStrategy.signalAllWhenBlocking();
     }
 
