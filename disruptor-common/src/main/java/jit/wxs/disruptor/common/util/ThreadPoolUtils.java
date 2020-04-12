@@ -13,6 +13,8 @@ import java.util.logging.Logger;
  * @date 2020年02月16日 18:14
  */
 public class ThreadPoolUtils {
+    private static final Integer CPU_AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
+
     private static final Logger logger = Logger.getLogger(ThreadPoolUtils.class.getName());
 
     private static final long TIMEOUT = 100L;
@@ -24,6 +26,10 @@ public class ThreadPoolUtils {
     private static final String NAME_SEPARATOR = "";
 
     private static LogUncaughtExceptionHandler EXCEPTION_HANDLER = new LogUncaughtExceptionHandler();
+
+    public static ThreadPoolExecutor poolExecutor(Object... name) {
+        return poolExecutor(CPU_AVAILABLE_PROCESSORS, CPU_AVAILABLE_PROCESSORS, name);
+    }
 
     public static ThreadPoolExecutor poolExecutor(int core, int max, Object... name) {
         ThreadFactoryBuilder builder = new ThreadFactoryBuilder();
