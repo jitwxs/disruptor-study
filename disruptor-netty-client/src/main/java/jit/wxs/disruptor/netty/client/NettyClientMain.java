@@ -22,7 +22,7 @@ public class NettyClientMain {
         nettyClient.start();
 
         // 2. 向服务端发送消息
-        ThreadPoolExecutor executor = ThreadPoolUtils.poolExecutor("netty-client");
+        ThreadPoolExecutor executor = ThreadPoolUtils.defaultPoolExecutor("netty-client");
         IntStream.range(1, 5).forEach(index -> executor.execute(() -> {
             IntStream.range(1, 100).forEach(subIndex -> {
                 Entry entry = new Entry();

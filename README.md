@@ -26,6 +26,7 @@ disruptor-study
 以完成 Test Case 包括：
 
 - [x] 缓存行测试：`jit.wxs.disruptor.demo.flashsharing`
+- [x] RingBuffer Size 过大导致 OOM：`jit.wxs.disruptor.demo.oom`
 
 ## Netty Case
 

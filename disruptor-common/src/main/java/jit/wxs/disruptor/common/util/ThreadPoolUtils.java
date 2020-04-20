@@ -27,7 +27,7 @@ public class ThreadPoolUtils {
 
     private static LogUncaughtExceptionHandler EXCEPTION_HANDLER = new LogUncaughtExceptionHandler();
 
-    public static ThreadPoolExecutor poolExecutor(Object... name) {
+    public static ThreadPoolExecutor defaultPoolExecutor(Object... name) {
         return poolExecutor(CPU_AVAILABLE_PROCESSORS, CPU_AVAILABLE_PROCESSORS, name);
     }
 
