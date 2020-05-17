@@ -13,31 +13,20 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github.jitwxs</groupId>
+            <artifactId>commons-core</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.10</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>28.2-jre</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.9</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>4.1.48.Final</version>
             <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.68</version>
         </dependency>
     </dependencies>
 </project>

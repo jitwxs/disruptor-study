@@ -1,6 +1,6 @@
 package jit.wxs.disruptor.demo.flashsharing;
 
-import jit.wxs.disruptor.common.util.DateUtils;
+import com.github.jitwxs.commons.core.date.TimeUtils;
 import jit.wxs.disruptor.demo.flashsharing.bean.FlashSharingConstant;
 import jit.wxs.disruptor.demo.flashsharing.bean.PaddingLong;
 
@@ -21,9 +21,9 @@ public class PaddingTest {
         for (int i = 0; i < longs.length; i++) {
             longs[i] = new PaddingLong();
         }
-        final long start = DateUtils.nowTime();
+        final long start = TimeUtils.nowMs();
         runTest();
-        System.out.println("Duration = " + (DateUtils.nowTime() - start) + "ms");
+        System.out.println("Duration = " + TimeUtils.diffMs(start) + "ms");
     }
 
     private static void runTest() throws InterruptedException {

@@ -1,6 +1,6 @@
 package jit.wxs.disruptor.netty.client.handler;
 
-import com.alibaba.fastjson.JSON;
+import com.github.jitwxs.commons.core.json.JacksonUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -62,7 +62,7 @@ public class NettyClient {
      * 向服务端发送消息
      */
     public void sendServer(Entry entry) {
-        this.channelFuture.channel().writeAndFlush(JSON.toJSONString(entry));
+        this.channelFuture.channel().writeAndFlush(JacksonUtils.objectToJson(entry));
     }
 
     public void syncClose() {

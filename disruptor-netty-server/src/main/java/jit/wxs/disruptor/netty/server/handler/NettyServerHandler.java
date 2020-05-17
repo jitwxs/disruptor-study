@@ -1,10 +1,9 @@
 package jit.wxs.disruptor.netty.server.handler;
 
-import com.alibaba.fastjson.JSONObject;
+import com.github.jitwxs.commons.core.json.JacksonUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import jit.wxs.disruptor.common.netty.Entry;
-import jit.wxs.disruptor.netty.server.ringbuffer.RingBufferManagement;
 import jit.wxs.disruptor.netty.server.ringbuffer.RingBufferService;
 
 import java.util.logging.Level;
@@ -28,7 +27,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String s) throws Exception {
-        Entry entry = JSONObject.parseObject(s, Entry.class);
+        Entry entry = JacksonUtils.jsonToObject(s, Entry.class);
         logger.info("Server Rec: " + entry);
 
         // 转发至 Disruptor

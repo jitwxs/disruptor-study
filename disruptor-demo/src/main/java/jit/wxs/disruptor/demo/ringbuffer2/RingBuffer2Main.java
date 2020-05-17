@@ -1,7 +1,7 @@
 package jit.wxs.disruptor.demo.ringbuffer2;
 
+import com.github.jitwxs.commons.core.thread.ThreadPoolUtils;
 import com.lmax.disruptor.*;
-import jit.wxs.disruptor.common.util.ThreadPoolUtils;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.util.UUID;
@@ -51,7 +51,7 @@ public class RingBuffer2Main {
 
         // 启动workPool
         int coreSize = Runtime.getRuntime().availableProcessors();
-        ExecutorService executor = ThreadPoolUtils.poolExecutor(coreSize, coreSize);
+        ExecutorService executor = ThreadPoolUtils.unBondQueueExecutor(coreSize);
         workerPool.start(executor);
 
         CountDownLatch mainLatch = new CountDownLatch(1);
@@ -82,7 +82,7 @@ public class RingBuffer2Main {
 
         // 回收资源
         workerPool.halt();
-        ThreadPoolUtils.shutdown(executor);
+        ThreadPoolUtils.shutdown(executor, 100, () -> System.out.println("close thread pool error"));
     }
 
     private static Consumer[] buildConsumers() {
