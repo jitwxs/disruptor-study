@@ -1,6 +1,6 @@
 package jit.wxs.disruptor.demo.flashsharing;
 
-import com.github.jitwxs.commons.core.date.TimeUtils;
+import com.github.jitwxs.commons.core.util.TimeUtils;
 import jit.wxs.disruptor.demo.flashsharing.bean.ContendedLong;
 import jit.wxs.disruptor.demo.flashsharing.bean.FlashSharingConstant;
 

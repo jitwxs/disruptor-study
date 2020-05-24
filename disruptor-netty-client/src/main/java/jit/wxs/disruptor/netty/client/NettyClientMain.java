@@ -1,6 +1,6 @@
 package jit.wxs.disruptor.netty.client;
 
-import com.github.jitwxs.commons.core.thread.ThreadPoolUtils;
+import com.github.jitwxs.commons.core.util.thread.ThreadPoolUtils;
 import jit.wxs.disruptor.common.netty.Constant;
 import jit.wxs.disruptor.common.netty.Entry;
 import jit.wxs.disruptor.netty.client.handler.NettyClient;

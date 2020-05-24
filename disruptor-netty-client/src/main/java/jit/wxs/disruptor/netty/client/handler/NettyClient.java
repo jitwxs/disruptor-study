@@ -1,6 +1,6 @@
 package jit.wxs.disruptor.netty.client.handler;
 
-import com.github.jitwxs.commons.core.json.JacksonUtils;
+import com.github.jitwxs.commons.core.util.JacksonUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

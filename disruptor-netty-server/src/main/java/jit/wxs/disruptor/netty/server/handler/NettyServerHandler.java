@@ -1,6 +1,6 @@
 package jit.wxs.disruptor.netty.server.handler;
 
-import com.github.jitwxs.commons.core.json.JacksonUtils;
+import com.github.jitwxs.commons.core.util.JacksonUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import jit.wxs.disruptor.common.netty.Entry;
