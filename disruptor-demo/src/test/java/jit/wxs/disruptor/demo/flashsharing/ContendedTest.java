@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
  * 需开启 JVM 参数 -XX:-RestrictContended
  * @author jitwxs
  * @date 2020年03月15日 23:10
+ * @since <= 1.8
  */
 public class ContendedTest {
     private static ContendedLong[] longs;
